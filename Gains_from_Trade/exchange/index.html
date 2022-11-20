@@ -1,0 +1,111 @@
+<!-- <div id="contains_checkbox"></div>
+
+<script>
+
+    let cards_get = ["Saab", "Volvo", "BMW"];
+    let getcardnum = 3
+    // let havecardnum = js_vars.havecardnum
+
+    function create_checkbox(){
+        var i=0;
+        var stop=getcardnum;
+
+        for (i=0;i<stop;i++) {  
+            var v = document.createElement('input');
+            v.type="checkbox";
+            v.id = "checkbox"+i;
+            v.value=cards_get[i];
+            console.log(cards_get[i])
+            document.getElementById('contains_checkbox').appendChild(v);
+            
+            var q = document.createElement('label');
+            q.setAttribute("for","checkbox"+i);
+            q.innerHTML=cards_get[i];
+            // q.id = v.id+"label"
+            document.getElementById('contains_checkbox').appendChild(q);
+            
+            var br = document.createElement('br');
+            document.getElementById('contains_checkbox').appendChild(br);
+        }
+    }
+    create_checkbox();
+
+// function LoopTest() {
+
+    
+// var i=0;
+// var stop=5;
+// for (i=0;i<5;i++) {  
+//     var v = document.createElement('input');
+//     v.type="button";
+//     v.value="Button " +i;
+//      document.getElementById('contains_checkbox').appendChild(v);
+// }
+// }
+
+// LoopTest();
+</script> -->
+
+<!-- <div id="1" style="display: none">1</div>
+<div id="2" style="display: none">2</div>
+<div id="3" style="display: none">3</div>
+
+<script>
+    let chosen =1
+    if ( chosen ==1){
+        document.getElementById("1").style.display = "block"
+    }else if (chosen ==2){
+        document.getElementById("2").style.display = "block"
+    }else{
+        document.getElementById("3").style.display = "block"
+    }
+</script> -->
+
+<!-- 
+<div id = "div_choose_card_solo" style="display:none">
+    以下是你的 {{C.NumOfCardsRecieved}} 張牌，
+    請在其中選出你要的{{C.NumOfCardsPlayable}} 張牌。
+    <div id="contains_checkbox"></div>
+    <button type="button" onclick="card_solo()">選擇手牌</button>
+    <div id="wrong_amount_of_card"></div>
+</div>
+
+<div id = "div_point_card_solo" style="display:none">
+    你的牌組有以下排型，獲得 <div id="pysolo"></div>.
+</div>
+
+<script>
+
+    var chosen = 0
+
+    if (chosen != 1){
+        document.getElementById("div_choose_card_solo").style.display = "block"
+    }else{
+        document.getElementById("div_point_card_solo").style.display = "block"
+    }   
+
+    function card_solo(){
+        chosen =1 
+    }
+
+    
+</script>
+
+
+['207', '413', '411', '204', '112', '407', '406', '210', '410', '108', '202', '401', '305', '404', '208', '203', '113', '313', '408', '107', '302', '311', '106', '310', '213', '211', '301', '405', '111', '306', '104', '209', '307', '412', '304', '403', '110', '303', '212', '312', '109', '105', '205', '201', '409', '101', '206', '402', '308', '102', '309', '103']
+  -->
+
+  <ul>
+  <li><input type="checkbox" id="cb1" style="display: none"/>
+    <label for="cb1"><img src="https://picsum.photos/seed/1/100" /></label>
+  </li>
+  <li><input type="checkbox" id="cb2" />
+    <label for="cb2"><img src="https://picsum.photos/seed/2/100" /></label>
+  </li>
+  <li><input type="checkbox" id="cb3" />
+    <label for="cb3"><img src="https://picsum.photos/seed/3/100" /></label>
+  </li>
+  <li><input type="checkbox" id="cb4" />
+    <label for="cb4"><img src="https://picsum.photos/seed/4/100" /></label>
+  </li>
+</ul>

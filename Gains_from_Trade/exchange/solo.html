@@ -1,0 +1,200 @@
+{{ block title }}
+    選擇留下的牌組
+{{ endblock }}
+
+
+{{ block content }}
+
+    <!-- <link rel="stylesheet" href="{{ static 'global/Card.css' }}"> -->
+
+    <div id = "div_choose_card_solo" style="display:block">
+        以下是你的 {{C.NumOfCardsRecieved}} 張牌，
+        請在其中選出你要的{{C.NumOfCardsPlayable}} 張牌。
+        <div id="contains_checkbox"></div>
+        <div id="playercardchoose" class="card_slot">
+            <!-- <div class="card red" data-value="9♠">
+                ♠
+            </div> -->
+        </div>
+        <button type="button" onclick="card_solo()">選擇手牌</button>
+        <div id="wrong_amount_of_card"></div>
+    </div>
+
+    <div id="div_waiting" style="display:none">
+    分數計算中...
+    </div>
+
+    <div id = "div_point_card_solo" style="display:none">
+        以下是你所選擇的手牌。
+        <div id="div_cards"></div>
+        <div id="div_card_set"></div>
+        <div id="pysolo"></div> 
+        {{next_button}}
+    </div>
+
+{{ endblock }}
+
+{% block scripts %}
+
+<script>
+    let suit = ["0","♠", "♣", "♥", "♦"]
+    let index = ["0", "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+    
+    let cards_get = js_vars.cardrecieved
+    let getcardnum = js_vars.getcardnum
+    let havecardnum = js_vars.havecardnum
+    let pysolo = js_vars.pysolo
+    let id = js_vars.id
+    var card_choose_local = [];
+
+
+    function create_checkbox(){
+
+        var i=0;
+        var stop=getcardnum;
+
+        for (i=0;i<stop;i++) {  
+            cardindex = cards_get[i]%100
+            cardsuit = parseInt(cards_get[i]/100)
+            var v = document.createElement('input');
+            v.type="checkbox";
+            v.id = "checkbox"+i;
+            v.name = "checkbox";
+            // v.checked = true;
+            v.value=cards_get[i];
+            // console.log(cards_get[i])
+            document.getElementById('contains_checkbox').appendChild(v);
+            
+            var q = document.createElement('label');
+            q.setAttribute("for","checkbox"+i);
+            // q.innerHTML=cards_get[i];
+            q.innerHTML=index[cardindex] +suit[cardsuit];
+            // q.id = v.id+"label"
+            document.getElementById('contains_checkbox').appendChild(q);
+            
+            // var br = document.createElement('br');
+            // document.getElementById('contains_checkbox').appendChild(br);
+        }
+        document.getElementById("div_choose_card_solo").style.display = "block";
+
+    }
+
+
+
+    // function create_card(){
+
+    //     var i=0;
+    //     var stop=getcardnum;
+    //     // var stop=100;
+
+    //     for (i=0;i<stop;i++) {  
+    //         cardindex = cards_get[i]%100
+    //         cardsuit = parseInt(cards_get[i]/100)
+
+    //         var v = document.createElement('input');
+    //         v.type="checkbox";
+    //         v.id = "cardbox"+i;
+    //         v.name = "checkbox";
+    //         v.checked = true;
+    //         v.style="display: none"
+    //         v.value=cards_get[i];
+    //         // console.log(cards_get[i])
+    //         document.getElementById('playercardchoose').appendChild(v);
+            
+    //         var q = document.createElement('label');
+    //         q.setAttribute("for","cardbox"+i);
+    //         // q.innerHTML=cards_get[i];
+    //         // q.innerHTML=index[cardindex] +suit[cardsuit];
+    //         q.id = v.id+"labelforcard"
+    //         // console.log(q.id)
+    //         document.getElementById('playercardchoose').appendChild(q);
+
+    //         // let card = new card(cardindex,cardsuit)
+    //         let carddiv = document.createElement("div")
+    //         // carddiv.classList.add("red")
+    //         carddiv.classList.add("card")
+    //         carddiv.innerHTML = suit[cardsuit]
+    //         carddiv.dataset.value = (suit[cardsuit])+(index[cardindex])
+    //         if(cardsuit <= 2){
+    //             carddiv.classList.add("black")
+    //         }else{
+    //             carddiv.classList.add("red")
+    //         }
+    //         document.getElementById(v.id+"labelforcard").appendChild(carddiv);
+
+    //         // document.getElementById(v.id+"labelforcard").appendChild(card);
+            
+                    
+    //             // document.getElementById('contains_checkbox').appendChild(br);
+    //     }
+    //     document.getElementById("div_choose_card_solo").style.display = "block";
+
+    // }
+
+
+    // create_card();
+ 
+    create_checkbox();
+
+    function card_solo(){
+        var markedCheckbox = document.getElementsByName('checkbox');  
+        // var markedCheckbox = document.getElementsByName('contains_checkbox');
+
+        for (var checkbox of markedCheckbox) {  
+            if (checkbox.checked)  
+                card_choose_local.push(checkbox.value)
+            // document.body.append(checkbox.value + ' ');  
+        }                  
+        console.log(card_choose_local)
+
+        if (card_choose_local.length != havecardnum){
+            document.getElementById("wrong_amount_of_card").innerHTML = "卡片選取數量不對，請再次選擇。"
+            // console.log(chosen)
+            card_choose_local = []
+        }else{
+            document.getElementById("wrong_amount_of_card").innerHTML = ""
+
+            let cardsinstring = card_choose_local.join("")
+            // console.log(cardsinstring)
+            document.getElementById("div_choose_card_solo").style.display = "none";
+            document.getElementById("div_waiting").style.display = "block";
+            send_values(cardsinstring)
+        }
+        // 確認撲克牌數量正確
+        // 返回一個矩陣式所選的牌
+    }
+    
+    function send_values(value){
+        liveSend({"information_type":"cards", 'cards': value});
+    }
+
+    function create_cards(){
+
+        document.getElementById("div_cards").innerHTML = card_choose_local
+        }
+
+    let paymenthere = document.getElementById("pysolo")
+    // function update_pysolo(){
+    //     paymenthere.innerHTML = pysolo
+    // }
+    // 更新價格
+    
+    function liveRecv(data) {
+        console.log('received a message!', data);
+        // console.log(data.payment)
+        paymenthere.innerText = "本階段你獲得 " + data["payoff"]+ " 點的報酬。";
+        create_cards()
+        if(data["cardset"] != ""){
+            document.getElementById("div_card_set").innerText = "你所獲得的排型是 " + data["cardset"] + " 。"
+        }else{
+            document.getElementById("div_card_set").innerText = "你的手排沒有任何特殊排型。"
+        }
+        
+        document.getElementById("div_waiting").style.display = "none";
+        document.getElementById("div_point_card_solo").style.display = "block";
+        
+        }
+
+
+</script>
+{% endblock%}

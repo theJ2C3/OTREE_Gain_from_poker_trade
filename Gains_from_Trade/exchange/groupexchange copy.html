@@ -1,0 +1,121 @@
+{{ block title }}
+    選擇交換的牌組
+{{ endblock }}
+{{ block content }}
+
+
+    <div id = "div_switch_card" style="display:block">
+        在接下來，你可以透過以下聊天室窗與同組成員討論交易手牌，每個小組包含你共有兩名成員。<br>
+        唯有兩方交換排組的數量相同才會進入交易同意環節，否則直接結算回合得分。<br>
+        每回合只有一次交易的機會。<br>
+        你需要選擇好你要交換的卡牌並按下送出按鍵。<br>
+
+        {{chat}}
+
+        <br>
+        <div id="contains_checkbox"></div>
+        <button type="button" onclick="card_switch()">選擇交換的手牌</button>
+    </div>
+
+    <div id = "div_respond_offer" style = "display: none">
+        你收到的交易選項是用<span id="current_offer"></span>
+        <button type="button" onclick="accept_offer()">接受交易</button>
+        <button type="button" onclick="reject_offer()">不接受交易</button>
+    </div>
+
+    <div id = "div_point_card_group" style="display:none">
+        你的牌組有以下排型，獲得 (group分數)
+        <button type="button" onclick="card_solo()">選擇手牌</button>
+    </div>
+    <input type="hidden" id = "card_choose_input" name="card_choose">
+    <input type="hidden" id = "card_switched_input" name="card_switched">
+    <input type="hidden" id = "deal_input" name="deal">
+
+ 
+{{ endblock }}
+
+
+{% block scripts %}
+
+<script>
+    let cards_get = js_vars.cardchoose
+
+    let havecardnum = js_vars.havecardnum
+
+
+    
+    // if ( chosen ==0){
+    //     document.getElementById("div_switch_card").style.display = "block"
+    // }else if (chosen ==1 ){
+    //     document.getElementById("div_respond_offer").style.display = "block"
+    // }else{
+    //     document.getElementById("div_point_card_group").style.display = "block"
+    // }
+   
+
+    function create_checkbox(){
+        var i=0;
+        var stop=havecardnum;
+
+        for (i=0;i<stop;i++) {  
+            var v = document.createElement('input');
+            v.type="checkbox";
+            v.id = "checkbox"+i
+            v.name = "checkbox"
+            v.checked = true
+            v.value=cards_get[i];
+            console.log(cards_get[i])
+            document.getElementById('contains_checkbox').appendChild(v);
+            
+            var q = document.createElement('label');
+            q.setAttribute("for","checkbox"+i);
+            q.innerHTML=cards_get[i];
+            // q.id = v.id+"label"
+            document.getElementById('contains_checkbox').appendChild(q);
+            
+            var br = document.createElement('br');
+            document.getElementById('contains_checkbox').appendChild(br);
+        }
+        document.getElementById("div_choose_card_solo").style.display = "block";
+
+    }
+
+    create_checkbox();
+
+    
+
+    function card_switch(){
+        var markedCheckbox = document.getElementsByName('checkbox');  
+        var card_choose_local = [];
+
+        for (var checkbox of markedCheckbox) {  
+            if (checkbox.checked)  
+                card_choose_local.push(checkbox.value)
+            // document.body.append(checkbox.value + ' ');  
+        }                  
+        console.log(card_choose_local)
+
+        let cardsinstring = card_choose_local.join("")
+        console.log(cardsinstring)
+        send_values(cardsinstring)
+        document.getElementById("div_choose_card_solo").style.display = "none";
+        document.getElementById("div_point_card_solo").style.display = "block";
+
+        }
+        // 確認撲克牌數量正確
+        // 返回一個矩陣式所選的牌
+    
+    
+    function accept_offer(){
+        // if
+        chosen = 2
+    }
+    function reject_offer(){
+        // if
+        chosen = 2
+    }
+
+
+</script>
+
+{% endblock%}

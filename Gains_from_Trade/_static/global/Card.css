@@ -5,13 +5,43 @@
 .card_slot {
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(7, 4rem);
+  grid-template-columns: repeat(7,1rem 4rem);
   grid-template-rows: 7rem 7rem ;
   gap: .5rem;
-  cursor: pointer;
+  /* cursor: pointer; */
   justify-content: center;
   padding-top: 1rem;
 }
+
+
+input:checked + label .card {
+  /* border:1px solid;
+  display: none !important; */
+  background-color: green;
+}
+
+
+
+/* .checkbox input[type="checkbox"]:checked ~ label::before {
+  color: #7bbe72;
+  background-color: white;
+}
+
+.checkbox input[type="checkbox"]:checked ~ label::after {
+  -webkit-transform: rotate(-45deg) scale(1); 
+  transform: rotate(-45deg) scale(1); 
+  background-color: green;
+} */
+/* 
+#checkboxes input[type=checkbox]{
+  background-color: white;
+}
+
+
+#checkboxes input[type=checkbox]:checked + .card{
+    background-color: green;
+} */
+
   
   /* .deck {
     height: 100%;
@@ -44,8 +74,13 @@
   justify-content: center;
   align-items: center;
   font-size: 4rem;
+  cursor: pointer;
+
 }
-  
+/*   
+#exactcard2{
+  background-color: green;
+} */
 .card.red {
   color: red;
 }
@@ -61,6 +96,13 @@
   font-size: 1rem;
 }
   /* :not(:checked) */
+  /* .card:checked{
+    background-color: green;
+  }
+
+  .card:not(:checked){
+    background-color: white;
+  } */
 .card::before {
   top: .5rem;
   left: .5rem

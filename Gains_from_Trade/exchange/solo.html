@@ -5,12 +5,12 @@
 
 {{ block content }}
 
-    <!-- <link rel="stylesheet" href="{{ static 'global/Card.css' }}"> -->
+    <link rel="stylesheet" href="{{ static 'global/Card.css' }}">
 
     <div id = "div_choose_card_solo" style="display:block">
         以下是你的 {{C.NumOfCardsRecieved}} 張牌，
         請在其中選出你要的{{C.NumOfCardsPlayable}} 張牌。
-        <div id="contains_checkbox"></div>
+        <!-- <div id="contains_checkbox"></div> -->
         <div id="playercardchoose" class="card_slot">
             <!-- <div class="card red" data-value="9♠">
                 ♠
@@ -60,8 +60,10 @@
             v.type="checkbox";
             v.id = "checkbox"+i;
             v.name = "checkbox";
-            // v.checked = true;
+            v.checked = true;
             v.value=cards_get[i];
+            v.style = "opacity:0"        
+            // v.hidden = true
             // console.log(cards_get[i])
             document.getElementById('contains_checkbox').appendChild(v);
             
@@ -81,60 +83,66 @@
 
 
 
-    // function create_card(){
+    function create_card(){
 
-    //     var i=0;
-    //     var stop=getcardnum;
-    //     // var stop=100;
+        var i=0;
+        var stop=getcardnum;
+        // var stop=100;
 
-    //     for (i=0;i<stop;i++) {  
-    //         cardindex = cards_get[i]%100
-    //         cardsuit = parseInt(cards_get[i]/100)
+        for (i=0;i<stop;i++) {  
+            cardindex = cards_get[i]%100
+            cardsuit = parseInt(cards_get[i]/100)
 
-    //         var v = document.createElement('input');
-    //         v.type="checkbox";
-    //         v.id = "cardbox"+i;
-    //         v.name = "checkbox";
-    //         v.checked = true;
-    //         v.style="display: none"
-    //         v.value=cards_get[i];
-    //         // console.log(cards_get[i])
-    //         document.getElementById('playercardchoose').appendChild(v);
+            var v = document.createElement('input');
+            v.type="checkbox";
+            v.id = "cardbox"+i;
+            v.name = "checkbox";
+            // v.checked = true;
+            v.value=cards_get[i];
+            // v.style = "opacity:0;  left:9999px;"
+
+            // v.style="display: none"
+            // v.style = "opacity:.01  "
+            // v.hidden = true
+            // console.log(cards_get[i])
+            document.getElementById('playercardchoose').appendChild(v);
             
-    //         var q = document.createElement('label');
-    //         q.setAttribute("for","cardbox"+i);
-    //         // q.innerHTML=cards_get[i];
-    //         // q.innerHTML=index[cardindex] +suit[cardsuit];
-    //         q.id = v.id+"labelforcard"
-    //         // console.log(q.id)
-    //         document.getElementById('playercardchoose').appendChild(q);
+            var q = document.createElement('label');
+            q.setAttribute("for","cardbox"+i);
+            // q.innerHTML=cards_get[i];
+            // q.innerHTML=index[cardindex] +suit[cardsuit];
+            q.addclass = "whatever"
+            q.id = v.id+"labelforcard"
+            // console.log(q.id)
+            document.getElementById('playercardchoose').appendChild(q);
 
-    //         // let card = new card(cardindex,cardsuit)
-    //         let carddiv = document.createElement("div")
-    //         // carddiv.classList.add("red")
-    //         carddiv.classList.add("card")
-    //         carddiv.innerHTML = suit[cardsuit]
-    //         carddiv.dataset.value = (suit[cardsuit])+(index[cardindex])
-    //         if(cardsuit <= 2){
-    //             carddiv.classList.add("black")
-    //         }else{
-    //             carddiv.classList.add("red")
-    //         }
-    //         document.getElementById(v.id+"labelforcard").appendChild(carddiv);
+            // let card = new card(cardindex,cardsuit)
+            let carddiv = document.createElement("div")
+            // carddiv.classList.add("red")
+            carddiv.classList.add("card")
+            carddiv.id = "exactcard"+i
+            carddiv.innerHTML = suit[cardsuit]
+            carddiv.dataset.value = (suit[cardsuit])+(index[cardindex])
+            if(cardsuit <= 2){
+                carddiv.classList.add("black")
+            }else{
+                carddiv.classList.add("red")
+            }
+            document.getElementById(v.id+"labelforcard").appendChild(carddiv);
 
-    //         // document.getElementById(v.id+"labelforcard").appendChild(card);
+            // document.getElementById(v.id+"labelforcard").appendChild(card);
             
                     
-    //             // document.getElementById('contains_checkbox').appendChild(br);
-    //     }
-    //     document.getElementById("div_choose_card_solo").style.display = "block";
+                // document.getElementById('contains_checkbox').appendChild(br);
+        }
+        document.getElementById("div_choose_card_solo").style.display = "block";
 
-    // }
+    }
 
 
-    // create_card();
+    create_card();
  
-    create_checkbox();
+    // create_checkbox();
 
     function card_solo(){
         var markedCheckbox = document.getElementsByName('checkbox');  

@@ -3,6 +3,7 @@
 {{ endblock }}
 {{ block content }}
 
+    <link rel="stylesheet" href="{{ static 'global/Card.css' }}">
 
     <div id = "div_switch_card" style="display:block">
 
@@ -17,36 +18,73 @@
         <br>
         <div>請勾選欲交換的卡牌。</div>
         <div id="contains_checkbox"></div>
+        <div id="cardown" class="card_slot">
+            <!-- <div></div>
+            <div class="card red" data-value="9♠">
+                ♠
+            </div> -->
+        </div>
         <button type="button" onclick="card_switch()">選擇交換的手牌</button>
     </div>
+
+
+
 
     <div id="div_waiting_1" style = "display: none">
         等待對方的提案...
     </div>
 
+
+
+
+
+
+
     <div id = "div_respond_offer" style = "display: none">
-        <div id="div_offer"></div>
+
+        <p>以下是你原本的手牌</p>
+        <div id="cardown_2" class="card_slot"></div>
+
+        <p>以下是你所送出的卡牌。</p>
+        <div id="cardsent" class="card_slot"></div>
+
+        <p>以下是你所收到的卡牌。</p>
+        <div id="cardrecieved" class="card_slot"></div>
+
+        <p>若是交易成功，將會有以下手牌。</p>
+        <div id="cardifrenew" class="card_slot"></div>
+
         <button type="button" onclick="accept_offer()">接受交易</button>
         <button type="button" onclick="reject_offer()">不接受交易</button>
     </div>
+
+
+
+
+
 
     <div id="div_waiting_2" style = "display: none">
         等待對方對於提案的回應..
     </div>
 
+
+
+
+
+
     <div id = "div_point_card_group" style="display:none">
+
         <div id="sucess" style="display:none">交易成功</div>
         <div id="failed" style="display:none">交易失敗</div>
-        以下是你手牌。
-        <div id="div_cards"></div>
+
+        <p>以下是最終的手牌:</p>
+        <div id="cardrenew" class="card_slot"></div>
+        
+        <!-- <div id="div_cards"></div> -->
         <div id="div_card_set"></div>
         <div id="pycoop"></div>
         {{next_button}}
     </div>
-    <input type="hidden" id = "card_choose_input" name="card_choose">
-    <input type="hidden" id = "card_switched_input" name="card_switched">
-    <input type="hidden" id = "deal_input" name="deal">
-
  
 {{ endblock }}
 
@@ -54,11 +92,210 @@
 {% block scripts %}
 
 <script>
+    let suit = ["0","♠", "♣", "♥", "♦"]
+    let index = ["0", "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+    
     let cards_get = js_vars.cardchoose
     let havecardnum = js_vars.havecardnum
     var card_push_local = [];
     var card_save_local = [];
     var card_get_for_deal =[];
+    var card_after_deal = [];
+
+    function create_card_initial(){
+
+        var i=0;
+        var stop=havecardnum;
+        // var stop=100;
+
+        for (i=0;i<stop;i++) {  
+            cardindex = cards_get[i]%100
+            cardsuit = parseInt(cards_get[i]/100)
+
+            var v = document.createElement('input');
+            v.type="checkbox";
+            v.id = "cardbox"+i;
+            v.name = "checkbox";
+            // v.checked = true;
+            v.value=cards_get[i];
+            v.style = "opacity:.01  "
+            // console.log(cards_get[i])
+            document.getElementById('cardown').appendChild(v);
+            
+            var q = document.createElement('label');
+            q.setAttribute("for","cardbox"+i);
+            // q.innerHTML=cards_get[i];
+            // q.innerHTML=index[cardindex] +suit[cardsuit];
+            q.addclass = "whatever"
+            q.id = v.id+"labelforcard"
+            // console.log(q.id)
+            document.getElementById('cardown').appendChild(q);
+
+            let carddiv = document.createElement("div")
+            // carddiv.classList.add("red")
+            carddiv.classList.add("card")
+            carddiv.id = "exactcard"+i
+            carddiv.innerHTML = suit[cardsuit]
+            carddiv.dataset.value = (suit[cardsuit])+(index[cardindex])
+            if(cardsuit <= 2){
+                carddiv.classList.add("black")
+            }else{
+                carddiv.classList.add("red")
+            }
+            document.getElementById(v.id+"labelforcard").appendChild(carddiv);
+
+            // document.getElementById(v.id+"labelforcard").appendChild(card);
+            
+                    
+                // document.getElementById('contains_checkbox').appendChild(br);
+        }
+        // document.getElementById("div_choose_card_solo").style.display = "block";
+
+    }
+
+    create_card_initial();
+
+    function card_switch(){
+        var markedCheckbox = document.getElementsByName('checkbox');  
+
+        for (var checkbox of markedCheckbox) {  
+            if (checkbox.checked)  
+                card_push_local.push(checkbox.value)
+            else 
+                card_save_local.push(checkbox.value)
+        }                  
+
+        let cardsinstring = card_push_local.join("")
+        // console.log(cardsinstring)
+        send_push_cards(cardsinstring)
+        document.getElementById("div_switch_card").style.display = "none";
+        document.getElementById("div_waiting_1").style.display = "block";
+    }
+
+    function send_push_cards(value){
+        liveSend({"information_type":"push", 'cards': value});
+    }
+
+    function accept_offer(){
+        liveSend({"information_type":"respond","deal":"accepted" })
+        go_to_waiting2()
+    }
+
+    function reject_offer(){
+        liveSend({"information_type":"respond","deal":"rejected" })
+        go_to_waiting2()
+    }
+
+    // function create_cards(an_id,arr){
+    //     document.getElementById(an_id).innerHTML = arr
+    // }
+    
+    function create_card_by_location(locationid, arr, cardkind=""){
+        // clearing the field
+        console.log(cardkind)
+
+        var i=0;
+        // var stop=havecardnum;
+        var stop = arr.length
+
+        for (i=0;i<stop;i++) {  
+            cardindex = arr[i]%100
+            cardsuit = parseInt(arr[i]/100)
+
+            var v = document.createElement('div');
+            v.class = "blankdiv"
+            v.style = "opacity:.01 "
+            document.getElementById(locationid).appendChild(v);
+
+            let carddiv = document.createElement("div")
+            carddiv.classList.add("card")
+            if(cardkind == "sendout_card"){
+                carddiv.classList.add("sendout_card")
+            }else if(cardkind == "recieved_card"){
+                carddiv.classList.add("recieved_card")
+            }
+            carddiv.id = locationid+"exactcard"+i
+            carddiv.innerHTML = suit[cardsuit]
+            carddiv.dataset.value = (suit[cardsuit])+(index[cardindex])
+            if(cardsuit <= 2){
+                carddiv.classList.add("black")
+            }else{
+                carddiv.classList.add("red")
+            }
+            // document.getElementById(v.id+"labelforcard").appendChild(carddiv);
+            document.getElementById(locationid).appendChild(carddiv);
+            }
+        }
+
+    function liveRecv(data){
+        // console.log('received a message!', data);
+
+        if (data["information_type"] == "offer" && data["samecardamount"] == 1){
+            console.log(data)
+            document.getElementById("div_waiting_1").style.display = "none";
+            document.getElementById("div_respond_offer").style.display = "block";
+            
+            console.log(card_get_for_deal,card_push_local)
+
+            card_get_for_deal = data["offercard"]
+            // 收到的牌
+            // document.getElementById("div_offer").innerText = "你所收到的交易邀請是以你手上的 "+card_push_local +" 交換對方手上的 " +card_get_for_deal ;
+            card_after_deal = card_save_local.concat(card_get_for_deal)
+            create_card_by_location('cardown_2', cards_get)
+            create_card_by_location('cardsent', card_push_local, "sendout_card")
+            create_card_by_location('cardrecieved', card_get_for_deal, "recieved_card")
+            create_card_by_location('cardifrenew', card_after_deal)
+            // document.getElementById("div_offer").innerText += "\r\n" + "你手上的牌將從 "+ cards_get + " 變成 "+ card_get_for_deal;
+        
+        }else if(data["information_type"] == "offer" && data["samecardamount"] != 1){
+            card_after_deal = cards_get
+            go_to_ptcardgp()
+            document.getElementById("failed").style.display = "block";
+            // create_cards("div_cards", cards_et);
+            create_card_by_location('cardrenew', card_after_deal)
+
+            if(data["cardset"] != ""){
+                document.getElementById("div_card_set").innerText = "你所獲得的排型是 " + data["cardset"] + " 。"
+            }else{
+                document.getElementById("div_card_set").innerText = "你的手排沒有任何特殊排型。"
+            }
+            document.getElementById("pycoop").innerText = "本階段你獲得 " + data["payoff"]+ " 點的報酬。";
+
+        }else if(data["information_type"] == "deal" && data["deal"] == 1){
+            
+            go_to_ptcardgp()
+            create_card_by_location('cardrenew', card_after_deal)
+
+            document.getElementById("sucess").style.display = "block";
+            if(data["cardset"] != ""){
+                document.getElementById("div_card_set").innerText = "你所獲得的排型是 " + data["cardset"] + " 。"
+            }else{
+                document.getElementById("div_card_set").innerText = "你的手排沒有任何特殊排型。"
+            }
+            console.log(card_get_for_deal)
+            create_cards("div_cards", card_get_for_deal);
+            console.log(data["payoff"])
+            document.getElementById("pycoop").innerText = "本階段你獲得 " + data["payoff"]+ " 點的報酬。";
+        
+        }else if(data["information_type"] == "deal" && data["deal"] != 1){
+            go_to_ptcardgp()
+
+            document.getElementById("failed").style.display = "block";
+            card_after_deal = cards_get
+            console.log(card_after_deal)
+            create_card_by_location('cardrenew', card_after_deal)
+            document.getElementById("div_card_set").innerText = "你所獲得的排型是 " + data["cardset"] + " 。"
+            if(data["cardset"] != ""){
+                document.getElementById("div_card_set").innerText = "你所獲得的排型是 " + data["cardset"] + " 。"
+            }else{
+                document.getElementById("div_card_set").innerText = "你的手排沒有任何特殊排型。"
+            }
+            create_cards("div_cards", cards_get);
+            console.log(data["payoff"])
+            document.getElementById("pycoop").innerText = "本階段你獲得 " + data["payoff"]+ " 點的報酬。";
+        }
+    }
+    
 
     function create_checkbox(){
         var i=0;
@@ -83,47 +320,11 @@
             var br = document.createElement('br');
             document.getElementById('contains_checkbox').appendChild(br);
         }
-        document.getElementById("div_choose_card_solo").style.display = "block";
+        document.getElementById("div_switch_card").style.display = "block";
 
     }
 
-    create_checkbox();
-
-    function card_switch(){
-        var markedCheckbox = document.getElementsByName('checkbox');  
-
-        for (var checkbox of markedCheckbox) {  
-            if (checkbox.checked)  
-                card_push_local.push(checkbox.value)
-            else 
-                card_save_local.push(checkbox.value)
-            // document.body.append(checkbox.value + ' ');  
-        }                  
-
-        // console.log(card_push_local)
-        // console.log(card_save_local)
-
-        let cardsinstring = card_push_local.join("")
-        // console.log(cardsinstring)
-        send_push_cards(cardsinstring)
-        document.getElementById("div_switch_card").style.display = "none";
-        document.getElementById("div_waiting_1").style.display = "block";
-    }
-
-    function send_push_cards(value){
-        liveSend({"information_type":"push", 'cards': value});
-    }
-
-    function accept_offer(){
-        liveSend({"information_type":"respond","deal":"accepted" })
-        go_to_waiting2()
-    }
-
-    function reject_offer(){
-        liveSend({"information_type":"respond","deal":"rejected" })
-        go_to_waiting2()
-    }
-
+    // create_checkbox();
     function go_to_waiting2(){
         document.getElementById("div_respond_offer").style.display = "none";
         document.getElementById("div_waiting_2").style.display = "block";
@@ -136,72 +337,6 @@
         document.getElementById("div_waiting_2").style.display = "none";
         document.getElementById("div_point_card_group").style.display = "block";
     }
-
-    function create_cards(an_id,arr){
-        document.getElementById(an_id).innerHTML = arr
-    }
-
-    // let paymenthere = document.getElementById("pycoop")
-    
-    
-    function liveRecv(data){
-        // console.log('received a message!', data);
-
-        if (data["information_type"] == "offer" && data["samecardamount"] == 1){
-            
-            document.getElementById("div_waiting_1").style.display = "none";
-            document.getElementById("div_respond_offer").style.display = "block";
-            console.log(card_get_for_deal,card_push_local)
-            card_get_for_deal = data["offercard"]
-            document.getElementById("div_offer").innerText = "你所收到的交易邀請是以你手上的 "+card_push_local +" 交換對方手上的 " +card_get_for_deal ;
-            card_get_for_deal = card_save_local.concat(card_get_for_deal)
-            document.getElementById("div_offer").innerText += "\r\n" + "你手上的牌將從 "+ cards_get + " 變成 "+ card_get_for_deal;
-        
-        }else if(data["information_type"] == "offer" && data["samecardamount"] != 1){
-            
-            go_to_ptcardgp()
-
-            document.getElementById("failed").style.display = "block";
-            create_cards("div_cards", cards_get);
-            if(data["cardset"] != ""){
-                document.getElementById("div_card_set").innerText = "你所獲得的排型是 " + data["cardset"] + " 。"
-            }else{
-                document.getElementById("div_card_set").innerText = "你的手排沒有任何特殊排型。"
-            }
-            document.getElementById("pycoop").innerText = "本階段你獲得 " + data["payoff"]+ " 點的報酬。";
-
-        }else if(data["information_type"] == "deal" && data["deal"] == 1){
-            
-            go_to_ptcardgp()
-
-            document.getElementById("sucess").style.display = "block";
-            if(data["cardset"] != ""){
-                document.getElementById("div_card_set").innerText = "你所獲得的排型是 " + data["cardset"] + " 。"
-            }else{
-                document.getElementById("div_card_set").innerText = "你的手排沒有任何特殊排型。"
-            }
-            console.log(card_get_for_deal)
-            create_cards("div_cards", card_get_for_deal);
-            document.getElementById("pycoop").innerText = "本階段你獲得 " + data["payoff"]+ " 點的報酬。";
-
-        }else if(data["information_type"] == "deal" && data["deal"] != 1){
-            
-            go_to_ptcardgp()
-
-            document.getElementById("failed").style.display = "block";
-            document.getElementById("div_card_set").innerText = "你所獲得的排型是 " + data["cardset"] + " 。"
-            if(data["cardset"] != ""){
-                document.getElementById("div_card_set").innerText = "你所獲得的排型是 " + data["cardset"] + " 。"
-            }else{
-                document.getElementById("div_card_set").innerText = "你的手排沒有任何特殊排型。"
-            }
-            create_cards("div_cards", cards_get);
-            document.getElementById("pycoop").innerText = "本階段你獲得 " + data["payoff"]+ " 點的報酬。";
-        }
-    }
-    
-
-
 
 </script>
 

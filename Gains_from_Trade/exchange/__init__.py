@@ -11,7 +11,8 @@ import matplotlib
 import matplotlib.patches as mpatches
 import matplotlib.font_manager as fm
 import numpy as np
-font = fm.FontProperties(fname='c:\\windows\\fonts\\simsun.ttc')  # speicify font
+# font = fm.FontProperties(fname='c:\\windows\\fonts\\simsun.ttc')  # speicify font
+font = fm.FontProperties(fname='_static/global/simsun.ttc')  # speicify font
 matplotlib.use('Agg')
 doc = """
 gains from trade
@@ -22,7 +23,8 @@ class C(BaseConstants):
     INSTRUCTIONS_TEMPLATE = 'exchange/instructions.html'
     PLAYERS_PER_GROUP = 2
     NUM_ROUNDS = 2
-    NumOfCardsRecieved = 5
+    NumOfCardsRecieved = 7
+    # NumOfCardsRecieved = 5
     NumOfCardsPlayable = 5
 
 def c2s(cards):
@@ -37,9 +39,9 @@ def s2c(cardstring):
         return ""
     length = len(cardstring);   
     chars = 3
-    #Stores the array of string  
+    # Stores the array of string  
     equalStr = []
-    #Check whether a string can be divided into n equal parts  
+    # Check whether a string can be divided into n equal parts  
     if (length % chars ==0):
         for i in range(0, length, chars):  
             equalStr.append(cardstring[ i : i+chars])
@@ -89,37 +91,11 @@ class Group(BaseGroup):
 class Player(BasePlayer):
     switch_yet = models.IntegerField(initial=0)
 
-    # def serve_card(ramnum):
-    #     deck = []
-    #     suit = [100, 200, 300, 400]
-    #     for i in range(13):
-    #         for j in range(4):
-    #             card = int(suit[j] + i+1)
-    #             deck.append(card)
-        
-    #     random.shuffle(deck)
-    #     returnitem = str(c2s(deck[ramnum*C.NumOfCardsRecieved:(ramnum+1)*C.NumOfCardsRecieved]))
-    #     # return models.StringField(returnitem)
-    #     return returnitem
-
-    # def initial_card_received(self):
-    #     id = self.id_in_group
-    #     # print(id)
-    #     # id = int(id)
-    #     get_card= s2c(self.subsession.card_deck)
-    #     chosencard = get_card[id*C.NumOfCardsRecieved, (id +1) *C.NumOfCardsRecieved]
-    #     print(chosencard)
-    #     # cards = self.pick_cards(self, id)
-    #     # self.cards_received = str(c2s(chosencard))
-    #     return str(c2s(chosencard))
-
     # cards_received = models.StringField(initial="101102103104105")
-
     cards_received = models.StringField(initial= serve_card(random.randint(0,3)))
     card_choose = models.StringField(initial= "000")
     card_switched = models.StringField(initial= "000")
     card_get_for_deal = models.StringField(initial= "000")
-    
     card_after_switched = models.StringField(initial= "000")
     # card_received = models.LongStringField()
     # card_chosen =  tool_models.MultipleChoiceModelField(label="Please select the three correct statements",
@@ -240,13 +216,11 @@ def check_one_pairs(hand):
 def check_switch_card_amount(group:Group):
     p1 = group.get_player_by_id(1)
     p2 = group.get_player_by_id(2)
-    # print(p1.card_switched, p2.card_switched)
 
     if len(p1.card_switched) == len(p2.card_switched) and len(p2.card_switched) !=0:
-        # print(len(p1.card_switched), len(p2.card_switched))
-        # print(len(p1.card_switched) == len(p2.card_switched))
-        # print(len(p2.card_switched) !=0)
         return True
+    else:
+        return False
 
 def handing_cards(player:Player):
     l1 = s2c(player.card_choose)
@@ -284,42 +258,17 @@ def create_figure(player:Player):
 
         maxvalue = int(max(cooparray))
 
-        # ydata = guess_distrubution
-        # ydata = sorted_list(group)
-        # xdata = [i+1 for i in range(C.GUESS_MAX+1)]
-        # xlabel = [ None for i in range(C.GUESS_MAX+1)]
-        # ylabel = [i  for i in range(max(guess_distrubution)+1)]
-        # for i in range(C.GUESS_MAX+1):
-        #     if i% 5 == 0:
-        #         xlabel[i] = i
-
         # plt.clf()
         
         plt.figure(figsize=(5, 5))
 
-        # clrs = ['blue']*C.GUESS_MAX
-        # if(player.group.winnernum != 100):
-        #     clrs[player.group.winnernum] = 'red'
         plt.scatter(soloarray, cooparray, color="blue")
-        # plt.scatter(soloarray, cooparray)
-
-        # red_patch = mpatches.Patch(color='red', label='The Winner\'s Choice')
-        # blue_patch = mpatches.Patch(color='blue', label='Others\' Choices')
-
-        
-        # red_patch = mpatches.Patch(color='red', label='The Winner\'s Choice/勝者的選項')
-        # blue_patch = mpatches.Patch(color='blue', label='Others\' Choices/其餘參與者的選項')
-
-        # plt.legend(handles=[red_patch, blue_patch], prop=font)
 
         fig = plt.gcf()
-        # plt.xlabel("Choice Number")
-        # plt.ylabel("Choice Number Count")
-        # plt.title("Distribution of choices")
+
         plt.xlabel("自行選擇牌後的報酬", fontproperties=font)
         plt.ylabel("有交易選項後的報酬", fontproperties=font)
         plt.title("報酬分布圖", fontproperties=font)    
-        # print(maxvalue, type(maxvalue))
         plt.xlim(0, maxvalue+20)
         plt.ylim(0, maxvalue+20)
         x = np.linspace(0, maxvalue+20, 1000)
@@ -380,6 +329,7 @@ def deal_cards(player: Player):
 
 class Introduction(Page):
     def is_displayed(player: Player):
+        player.group.card_deck =  initial_card()
         deal_cards(player)
         print(player.id_in_group, player.cards_received)
         return player.round_number == 1
@@ -495,12 +445,12 @@ class groupexchange(Page):
                     # print("deal", True)
                     player.card_after_switched = c2s(list(set(s2c(player.card_choose)) - set(s2c(player.card_switched))))+   player.card_get_for_deal
                     another.card_after_switched = c2s(list(set(s2c(another.card_choose)) - set(s2c(another.card_switched))))+another.card_get_for_deal
-                    print(player.card_after_switched, another.card_after_switched)
-                    temp, player.carddet_coop = check_cu(s2c(player.card_choose))
+                    print(player.id_in_group, player.card_after_switched, another.card_after_switched)
+                    temp, player.carddet_coop = check_cu(s2c(player.card_after_switched))
                     player.PY_coop = cu(temp*5)
-                    temp, another.carddet_coop = check_cu(s2c(another.card_choose))
+                    temp, another.carddet_coop = check_cu(s2c(another.card_after_switched))
                     another.PY_coop = cu(temp*5)
-                    print(player.PY_coop,another.PY_coop)
+                    print(player.id_in_group, player.PY_coop,another.PY_coop)
 
                     return {player.id_in_group:{"information_type": "deal", "deal" :1, "cardset" : player.carddet_coop, "payoff" :player.PY_coop}, 
                     anotherid:{"information_type": "deal", "deal" :1, "cardset" :another.carddet_coop, "payoff" :another.PY_coop}
@@ -532,7 +482,12 @@ class Results(Page):
         return {'my_img' : create_figure(player)}
     pass
 
-page_sequence = [Introduction, solo, ResultsWaitPage, groupexchange, Results]
+page_sequence = [
+    Introduction, 
+    solo, 
+    ResultsWaitPage, 
+    groupexchange, 
+    Results]
 # page_sequence = [solo, ResultsWaitPage, groupexchange, Results]
 # page_sequence = [solo, ResultsWaitPage, Results]
 # page_sequence = [MyPage, Results]

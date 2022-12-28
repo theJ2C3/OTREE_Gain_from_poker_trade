@@ -2,6 +2,11 @@ from otree.api import *
 import random
 from collections import defaultdict
 
+from cardcalculate import *
+###################################################################################
+#               need this for calculate many card based things                    #
+###################################################################################
+
 from io import BytesIO
 from base64 import b64encode
 import urllib
@@ -23,57 +28,9 @@ class C(BaseConstants):
     INSTRUCTIONS_TEMPLATE = 'exchange/instructions.html'
     PLAYERS_PER_GROUP = 2
     NUM_ROUNDS = 2
-    NumOfCardsRecieved = 7
-    # NumOfCardsRecieved = 5
+    # NumOfCardsRecieved = 7
+    NumOfCardsRecieved = 5
     NumOfCardsPlayable = 5
-
-def c2s(cards):
-    # card to string
-    cardstring = ""
-    for card in cards:
-        cardstring += (str(card))
-    return cardstring
-
-def s2c(cardstring):
-    if cardstring is None:
-        return ""
-    length = len(cardstring);   
-    chars = 3
-    # Stores the array of string  
-    equalStr = []
-    # Check whether a string can be divided into n equal parts  
-    if (length % chars ==0):
-        for i in range(0, length, chars):  
-            equalStr.append(cardstring[ i : i+chars])
-            # part = str[ i : i+chars]
-            # equalStr.append(part)
-    return equalStr
-
-def initial_card():
-    deck = []
-    suit = [100, 200, 300, 400]
-    for i in range(13):
-        for j in range(4):
-            card = int(suit[j] + i+1)
-            deck.append(card)
-    
-    random.shuffle(deck)
-    returnitem = str(c2s(deck))
-    # return models.StringField(returnitem)
-    return returnitem
-
-def serve_card(ramnum):
-    deck = []
-    suit = [100, 200, 300, 400]
-    for i in range(13):
-        for j in range(4):
-            card = int(suit[j] + i+1)
-            deck.append(card)
-    
-    random.shuffle(deck)
-    returnitem = str(c2s(deck[ramnum*C.NumOfCardsRecieved:(ramnum+1)*C.NumOfCardsRecieved]))
-    # return models.StringField(returnitem)
-    return returnitem
 
 class Subsession(BaseSubsession):
     strsolo = models.StringField(initial="")
@@ -92,126 +49,32 @@ class Player(BasePlayer):
     switch_yet = models.IntegerField(initial=0)
 
     # cards_received = models.StringField(initial="101102103104105")
-    cards_received = models.StringField(initial= serve_card(random.randint(0,3)))
+    cards_received = models.StringField(initial= serve_card(random.randint(0,3),C.NumOfCardsRecieved))
     card_choose = models.StringField(initial= "000")
     card_switched = models.StringField(initial= "000")
     card_get_for_deal = models.StringField(initial= "000")
     card_after_switched = models.StringField(initial= "000")
     # card_received = models.LongStringField()
     # card_chosen =  tool_models.MultipleChoiceModelField(label="Please select the three correct statements",
+    # cards_received_gp = models.StringField(initial= serve_card(random.randint(0,3),C.NumOfCardsRecieved))
+    # cards_received_gp=card_after_switched
+    # need to be update
+    card_choose_gp = models.StringField(initial= "000")
+    card_switched_gp = models.StringField(initial= "000")
+    card_get_for_deal_gp = models.StringField(initial= "000")
+    card_after_switched_gp = models.StringField(initial= "000")
                                                             #   min_choices=C.NumOfCardsPlayable, max_choices=C.NumOfCardsPlayable)
     PY_solo = models.CurrencyField(initial=0)
     PY_coop = models.CurrencyField(initial=0)
+    PY_gp = models.CurrencyField(initial=0)
     carddet_solo = models.StringField()
     carddet_coop = models.StringField()
+    carddet_gp = models.StringField()
+    
     pass
 
 # FUNCTIONS
-
-## check cards cu    
-def check_cu(cards):
-    # cards = s2c(player.card_choose) ===set as input
-    cards2d =[[0 for i in range(2)] for j in range(C.NumOfCardsPlayable)]
-
-    # https://briancaffey.github.io/2018/01/02/checking-poker-hands-with-python.html/
-    for i in range(C.NumOfCardsPlayable):
-        cards2d[i][1] = int(cards[i])%100
-        cards2d[i][0] = int(cards[i])//100
-
-    if check_straight_flush(cards2d):
-        return (8, "同花順")
-    if check_four_of_a_kind(cards2d):
-        return (7, "鐵支")
-    if check_full_house(cards2d):
-        return (6 , "葫蘆")
-    if check_flush(cards2d):
-        return (5, "同花")
-    if check_straight(cards2d):
-        return (4,"順子")
-    if check_three_of_a_kind(cards2d):
-        return (3, "三條")
-    if check_two_pairs(cards2d):
-        return (2, "兩組對子")
-    if check_one_pairs(cards2d):
-        return 1, "一組對子"
-    return 0, ""
-
-def check_straight_flush(hand):
-    if check_flush(hand) and check_straight(hand):
-        return True
-    else:
-        return False
-
-def check_four_of_a_kind(hand):
-    values = [i[1] for i in hand]
-    value_counts = defaultdict(lambda:0)
-    for v in values:
-        value_counts[v]+=1
-    if sorted(value_counts.values()) == [1,4]:
-        return True
-    return False
-
-def check_full_house(hand):
-    values = [i[1] for i in hand]
-    value_counts = defaultdict(lambda:0)
-    for v in values:
-        value_counts[v]+=1
-    if sorted(value_counts.values()) == [2,3]:
-        return True
-    return False
-
-def check_flush(hand):
-    suits = [i[0] for i in hand]
-    if len(set(suits))==1:
-        return True
-    else:
-        return False
-
-def check_straight(hand):
-    values = [i[1] for i in hand]
-    value_counts = defaultdict(lambda:0)
-    for v in values:
-        value_counts[v] += 1
-    rank_values = [i for i in values]
-    value_range = max(rank_values) - min(rank_values)
-    if len(set(value_counts.values())) == 1 and (value_range==4):
-        return True
-    else:
-        #check straight with low Ace
-        if set(values) == set(["A", "2", "3", "4", "5"]):
-            return True
-        return False
-
-def check_three_of_a_kind(hand):
-    values = [i[1] for i in hand]
-    value_counts = defaultdict(lambda:0)
-    for v in values:
-        value_counts[v]+=1
-    if set(value_counts.values()) == set([3,1]):
-        return True
-    else:
-        return False
-
-def check_two_pairs(hand):
-    values = [i[1] for i in hand]
-    value_counts = defaultdict(lambda:0)
-    for v in values:
-        value_counts[v]+=1
-    if sorted(value_counts.values())==[1,2,2]:
-        return True
-    else:
-        return False
-
-def check_one_pairs(hand):
-    values = [i[1] for i in hand]
-    value_counts = defaultdict(lambda:0)
-    for v in values:
-        value_counts[v]+=1
-    if 2 in value_counts.values():
-        return True
-    else:
-        return False
-    
+ 
 
 def check_switch_card_amount(group:Group):
     p1 = group.get_player_by_id(1)
@@ -297,31 +160,20 @@ def create_figure(player:Player):
 
 def collect_num(player: Player):
     if player.round_number == C.NUM_ROUNDS:
-        # group = player.group
         subsession = player.subsession
         solo = ""
         coop = ""
-        # roundnum = group.round_number
         for j in range(C.NUM_ROUNDS):
             for p in subsession.get_players():
-                # print(type(i.in_round(j+1)))
-                # print(i.in_round(j+1).NumInput)
                 solo += str(int(p.in_round(j+1).PY_solo)).zfill(2)
                 coop += str(int(p.in_round(j+1).PY_coop)).zfill(2)
-        #     c += str(i..NumInput)
-        # f = group.field_maybe_none("strtest")
-        # if f == "None":
-        #     print(f)
-        #     c = c 
-        # else:
-        #     c = str(f) + c
         subsession.strsolo = solo 
         subsession.strcoop = coop 
 
 
 def deal_cards(player: Player):
     deck = s2c(player.group.card_deck)
-    print(deck)
+    # print(deck)
     id = player.id_in_group
     player.cards_received = str(c2s(deck[(id-1)*C.NumOfCardsRecieved:(id)*C.NumOfCardsRecieved]))
 
@@ -333,28 +185,14 @@ class Introduction(Page):
         deal_cards(player)
         print(player.id_in_group, player.cards_received)
         return player.round_number == 1
-    # @staticmethod
-    # def before_next_page(player: Player, timeout_happened):
-    #     deck = s2c(player.group.card_deck)
-    #     print(deck)
-    #     id = player.id_in_group
-    #     player.cards_received = str(c2s(deck[(id-1)*C.NumOfCardsRecieved:(id)*C.NumOfCardsRecieved]))
 
 class solo(Page):
-
-    # print(Subsession.card_deck)
-
-    # form_model = "player"
-    # form_fields = ["card_choose", "PY_solo"]
-
     @staticmethod
     def js_vars(player:Player):
         return dict(
         cardrecieved = s2c(player.cards_received),
         getcardnum = C.NumOfCardsRecieved,
         havecardnum = C.NumOfCardsPlayable,
-        # chosen_yet = player.chosen_yet,
-        # chosen_yet = 0,
         py_solo = player.PY_solo,
         id = player.id_in_group
         )
@@ -366,17 +204,7 @@ class solo(Page):
             player.card_choose = data["cards"]
             temp, player.carddet_solo = check_cu(s2c(player.card_choose))
             player.PY_solo = cu(temp*5)
-            # print(player.PY_solo, player.carddet_solo)
-            # player.chosen_yet = True
             return {player.id_in_group:{"information_type": "py", "payoff" :player.PY_solo, "cardset" : player.carddet_solo }}
-
-            # return{"player.id_in_group": player.PY_solo}
-            # if player.id_in_group == 1:
-            #     # return {1:{"information_type": "responde", "payoff" :player.PY_solo }}
-            #     return {1:{"information_type": "py", "payoff" :player.PY_solo }}
-            # else:
-            #     return {2:{"information_type": "py", "payoff" :player.PY_solo }}
-            
             
         # 這邊要計算並回傳cu
     pass
@@ -385,7 +213,7 @@ class solo(Page):
 class ResultsWaitPage(WaitPage):
     pass
 
-class groupexchange(Page):
+class pairexchange(Page):
 
     @staticmethod
     def js_vars(player:Player):
@@ -411,11 +239,6 @@ class groupexchange(Page):
 
             if player.switch_yet == 1 and another.switch_yet ==1:
                 if check_switch_card_amount(player.group):
-                    # print("offer", True)
-                    # print(player.id_in_group)
-                    # print(player.id_in_group,{"information_type": "offer", "samecardamount" :"True"}, 
-                    # anotherid,{"information_type": "offer", "samecardamount" :"True"}
-                    # )
                     player.card_get_for_deal = another.card_switched
                     another.card_get_for_deal = player.card_switched
                     # print(player.card_get_for_deal, another.card_get_for_deal)
@@ -486,7 +309,7 @@ page_sequence = [
     Introduction, 
     solo, 
     ResultsWaitPage, 
-    groupexchange, 
+    pairexchange, 
     Results]
 # page_sequence = [solo, ResultsWaitPage, groupexchange, Results]
 # page_sequence = [solo, ResultsWaitPage, Results]

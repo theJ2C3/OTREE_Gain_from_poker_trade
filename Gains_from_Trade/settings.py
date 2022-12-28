@@ -8,9 +8,9 @@ SESSION_CONFIGS = [
         num_demo_participants=2,
     ),
     # dict(
-    #     name='public_goods',
-    #     app_sequence=['public_goods'],
-    #     num_demo_participants=3,
+    #     name='test',
+    #     app_sequence=['testformodule'],
+    #     num_demo_participants=1,
     # ),
 ]
 

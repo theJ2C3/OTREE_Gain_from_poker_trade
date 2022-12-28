@@ -195,38 +195,38 @@
 
     
         // 沒有要用的了
-        function create_checkbox(){
+    function create_checkbox(){
 
-            var i=0;
-            var stop=getcardnum;
+        var i=0;
+        var stop=getcardnum;
 
-            for (i=0;i<stop;i++) {  
-                cardindex = cards_get[i]%100
-                cardsuit = parseInt(cards_get[i]/100)
-                var v = document.createElement('input');
-                v.type="checkbox";
-                v.id = "checkbox"+i;
-                v.name = "checkbox";
-                v.checked = true;
-                v.value=cards_get[i];
-                v.style = "opacity:0"        
-                // v.hidden = true
-                // console.log(cards_get[i])
-                document.getElementById('contains_checkbox').appendChild(v);
-                
-                var q = document.createElement('label');
-                q.setAttribute("for","checkbox"+i);
-                // q.innerHTML=cards_get[i];
-                q.innerHTML=index[cardindex] +suit[cardsuit];
-                // q.id = v.id+"label"
-                document.getElementById('contains_checkbox').appendChild(q);
-                
-                // var br = document.createElement('br');
-                // document.getElementById('contains_checkbox').appendChild(br);
-            }
-            document.getElementById("div_choose_card_solo").style.display = "block";
-
+        for (i=0;i<stop;i++) {  
+            cardindex = cards_get[i]%100
+            cardsuit = parseInt(cards_get[i]/100)
+            var v = document.createElement('input');
+            v.type="checkbox";
+            v.id = "checkbox"+i;
+            v.name = "checkbox";
+            v.checked = true;
+            v.value=cards_get[i];
+            v.style = "opacity:0"        
+            // v.hidden = true
+            // console.log(cards_get[i])
+            document.getElementById('contains_checkbox').appendChild(v);
+            
+            var q = document.createElement('label');
+            q.setAttribute("for","checkbox"+i);
+            // q.innerHTML=cards_get[i];
+            q.innerHTML=index[cardindex] +suit[cardsuit];
+            // q.id = v.id+"label"
+            document.getElementById('contains_checkbox').appendChild(q);
+            
+            // var br = document.createElement('br');
+            // document.getElementById('contains_checkbox').appendChild(br);
         }
+        document.getElementById("div_choose_card_solo").style.display = "block";
+
+    }
 
 
 </script>

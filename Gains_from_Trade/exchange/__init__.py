@@ -28,8 +28,8 @@ class C(BaseConstants):
     INSTRUCTIONS_TEMPLATE = 'exchange/instructions.html'
     PLAYERS_PER_GROUP = 2
     NUM_ROUNDS = 2
-    # NumOfCardsRecieved = 7
-    NumOfCardsRecieved = 5
+    NumOfCardsRecieved = 7
+    # NumOfCardsRecieved = 5
     NumOfCardsPlayable = 5
 
 class Subsession(BaseSubsession):
@@ -311,25 +311,3 @@ page_sequence = [
     ResultsWaitPage, 
     pairexchange, 
     Results]
-# page_sequence = [solo, ResultsWaitPage, groupexchange, Results]
-# page_sequence = [solo, ResultsWaitPage, Results]
-# page_sequence = [MyPage, Results]
-
-
-# def card_set_type(value):
-#     if value == 5:
-#         return "一組對子"
-#     if value == 10:
-#         return "兩組對子"
-#     if value == 15:
-#         return "三條"
-#     if value == 20:
-#         return "順子"
-#     if value == 25:
-#         return "同花"
-#     if value == 5:
-#         return "葫蘆"
-#     if value == 5:
-#         return "鐵支"
-#     if value == 5:
-#         return "同花順"
